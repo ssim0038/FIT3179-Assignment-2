@@ -1,9 +1,8 @@
 :root{
-  --bg:#ffff;        /* page background */
-  --panel:#f1d4d4;   /* page card background */
+  --bg:#ffff;        /* background */
+  --panel:#f1d4d4;   /* card background */
   --ink:#322936;     /* main text */
   --muted:#561414;   /* secondary text */
-  --card:#d8c9c9;    /* same as panel for simplicity */
   --radius:16px;
   --shadow:0 10px 30px rgba(0,0,0,.15);
 }
@@ -53,3 +52,4 @@ h2{ margin:0 0 15px 0; color:var(--ink); }
   color: var(--muted);
 }
 .footer small{ color: var(--muted); }
+
