@@ -1,0 +1,43 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Share of Channels by Category",
+  "width": 300,
+  "height": 300,
+  "background": "transparent",
+
+  "data": { "url": "../data/youtubers_df.csv" },
+
+  "transform": [
+    { "aggregate": [{ "op": "count", "as": "channels" }], "groupby": ["Categories"] }, 
+    { "joinaggregate": [{ "op": "sum", "field": "channels", "as": "total_channels" }] },
+    { "calculate": "datum.channels / datum.total_channels", "as": "percent" },
+    {"calculate": "datum.percent < 0.01 ? 'Others' : datum.Categories", "as": "cat_grouped"},
+    { "aggregate": [{ "op": "sum", "field": "channels", "as": "channels_grouped" }], "groupby": ["cat_grouped"] },
+    { "joinaggregate": [{ "op": "sum", "field": "channels_grouped", "as": "total_grouped" }] },
+    { "calculate": "datum.channels_grouped / datum.total_grouped", "as": "pct_grouped" }
+  ],
+
+  "mark": { "type": "arc", "innerRadius": 0, "tooltip": true},
+
+  "encoding": {
+    "theta": { "field": "channels_grouped", "type": "quantitative", "stack": true },
+    "color": {
+      "field": "cat_grouped",
+      "type": "nominal",
+      "title": "Category",
+      "scale": { "scheme": "tableau20" }
+    },
+    "tooltip": [
+      { "field": "cat_grouped", "type": "nominal", "title": "Category" },
+      { "field": "channels_grouped", "type": "quantitative", "title": "Channels", "format": ",.0f" },
+      { "field": "pct_grouped", "type": "quantitative", "title": "Percentage of channels", "format": ".1%" }
+    ]
+  },
+
+  "config": {
+    "view": { "stroke": null },
+    "axis": { "labelColor": "#322936", "titleColor": "#322936" },
+    "legend": { "labelColor": "#322936", "titleColor": "#322936" },
+    "title": { "color": "#322936", "fontWeight": 700 }
+  }
+}

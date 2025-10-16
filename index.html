@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Top YouTubers Across the Globe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Import Vega & Vega-Lite (does not have to be from CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.22.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.5.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.21.0"></script>
+
+  <!-- Import pure.css -->
+  <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css"
+  integrity="sha384-cg6SkqEOCV1NbJoCu11+bm0NvBRc8IYLRGXkmNrqUBfTjmMYwNKPWBTIKyw9mHNJ" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="css/styles.css" media="all">
+</head>
+<body>
+  <h1>Top 1000 YouTube Channels - An Overview</h1>
+
+  <div class="page">
+    <h2>Top YouTube Channels by Country</h2>
+    <p class="small-font">
+      Explore the global distribution of top YouTube creators.
+      Use the dropdown below to filter countries by a minimum subscriber threshold.
+    </p>
+    <!-- Choropleth Map -->
+    <div class="vis-container" id="choropleth_map"></div>
+  </div>
+
+    <div class="text-wide">
+      <p class="med-font">
+        The map shows the number of channels per country.Hover to see total subscribers and the top channel. 
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+        dolore magna aliqua. Massa sapien faucibus et molestie ac feugiat sed. Lorem ipsum dolor sit amet, 
+        consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Massa sapien faucibus et molestie ac feugiat sed
+      </p>
+    </div>
+
+    <!-- Two-column section for pie chart-->
+    <div class="page">
+      <h2>Categories of the Top Channels</h2>
+      <div class="pure-g">
+        <div class="pure-u-1-2 description-left">
+          <div id="pie_chart"></div>
+        </div>
+        <div class="pure-u-1-2 description-right">
+          <p class="small-font">
+            The pie chart reveals that a few key content categories dominate the YouTube 
+            space, with Entertainment (21.1%), Lifestyle (20.1%), and Music-related (9.4% + 2.8% + 2.6% + 2.0% + 1.0%) 
+            channels representing the largest proportions of the top creators worldwide. These categories 
+            collectively account for the majority of the dataset, highlighting how audiences tend to engage 
+            most with a variety of high-appealing content types that span international boundaries. Other notable 
+            categories - such as Film, Television, and Gaming-related content, contribute smaller but still meaningful 
+            shares, reflecting the diversity of creator interests and audience preferences. However, as there were 
+            many niche or highly specific categories that individually accounted for less than 1% each of 
+            the total, these smaller categories were grouped together under the “Others” category. This ensures the 
+            chart remains clear and readable while still acknowledging the wide range of specialized content 
+            that exists within the YouTube ecosystem.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  <!-- Two-column section for chart b -->
+  <div class="page">
+    <h2>Chart B</h2>
+    <div class="pure-g">
+      <div class="pure-u-1-2 description-left">
+        <p class="small-font">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+        dolore magna aliqua. Massa sapien faucibus et molestie ac feugiat sed. Lorem ipsum dolor sit amet, 
+        consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Massa sapien faucibus et molestie ac feugiat sed
+        </p>
+      </div>
+      <div class="pure-u-1-2 description-right">
+        <p class="small-font">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+        dolore magna aliqua. Massa sapien faucibus et molestie ac feugiat sed. Lorem ipsum dolor sit amet, 
+        consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Massa sapien faucibus et molestie ac feugiat sed
+        </p>
+        <div id="chartB"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <small>
+      Data: <br>
+      Clean Top 1000 Youtubers statistics [https://www.kaggle.com/datasets/mabelhsu/api-clean-top-1000-youtubers-statistics]. <br>
+      List of all countries with their ISO codes [https://www.iban.com/country-codes]
+    </small>
+  </footer>
+
+
+  <script type="text/javascript">
+
+  var spec1 = "js/choropleth_map.vg.json";
+  var spec2 = "js/pie_chart.vg.json";
+
+  vegaEmbed('#choropleth_map', spec1, {"actions": false });
+  
+  vegaEmbed('#pie_chart', spec2, {"actions": false }).then(function(result) {
+    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+  }).catch(console.error);
+
+</script>
+</body>
+</html>

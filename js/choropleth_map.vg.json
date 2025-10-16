@@ -1,0 +1,66 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+  "title": "Top YouTubers — Channels per Country",
+  "width": "container",
+  "height": 560,
+  "background": "#fcfdfd",
+  "projection": { "type": "equalEarth" },
+
+  "data": {
+    "url": "data/youtubers_df.csv"
+  },
+
+  "transform": [
+    {
+      "aggregate": [
+        { "op": "count", "field": "Username", "as": "channels_count" },
+        { "op": "sum",   "field": "Subscribers", "as": "total_subscribers" }
+      ],
+      "groupby": ["ISO-3"]
+    },
+    {
+      "lookup": "ISO-3",
+      "from": {
+        "data": {
+          "url": "data/ne_110m_admin_0_countries.topojson",
+          "format": { "type": "topojson", "feature": "ne_110m_admin_0_countries" }
+        },
+        "key": "properties.ADM0_A3"
+      },
+      "as": "geo"
+    },
+    {
+      "calculate": "datum.geo && datum.geo.properties ? datum.geo.properties.ADMIN : null",
+      "as": "Country"
+    }
+  ],
+
+  "layer": [
+    {
+      "data": {
+        "url": "data/ne_110m_admin_0_countries.topojson",
+        "format": { "type": "topojson", "feature": "ne_110m_admin_0_countries" }
+      },
+      "mark": { "type": "geoshape", "fill": "#e0e0e0", "stroke": "#ffffff", "strokeWidth": 0.5 }
+    },
+    {
+      "mark": { "type": "geoshape" },
+      "encoding": {
+        "shape": { "field": "geo", "type": "geojson" },
+        "color": {
+          "field": "channels_count",
+          "type": "quantitative",
+          "title": "Channels",
+          "scale": { "scheme": "reds" }
+        },
+        "tooltip": [
+          { "field": "Country", "title": "Country" },
+          { "field": "channels_count", "title": "Channels" },
+          { "field": "total_subscribers", "title": "Total subscribers" }
+        ]
+      }
+    },
+    { "mark": { "type": "geoshape", "fillOpacity": 0, "stroke": "#999", "strokeWidth": 0.4 } }
+  ]
+}
