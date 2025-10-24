@@ -19,7 +19,7 @@
   ],
 
   "data": {
-    "url": "data/youtubers_df.csv",
+    "url": "https://github.com/ssim0038/FIT3179-Assignment-2/blob/main/data/youtubers_df.csv",
     "format": { "type": "csv", "parse": { "Subscribers": "number" } }
   },
 
@@ -40,7 +40,7 @@
     {
       "lookup": "ISO3",
       "from": {
-        "data": { "url": "data/country_codes.csv", "format": { "type": "csv" } },
+        "data": { "url": "https://github.com/ssim0038/FIT3179-Assignment-2/blob/main/data/country_codes.csv", "format": { "type": "csv" } },
         "key": "Alpha-3 code",
         "fields": ["Country"]
       }
@@ -117,4 +117,5 @@
     "title": { "color": "#322936", "fontWeight": 700 }
   }
 }
+
 
