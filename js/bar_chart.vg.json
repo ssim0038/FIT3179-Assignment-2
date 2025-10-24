@@ -5,7 +5,7 @@
   "height": 300,
   "background": "#ffffff",
 
-  "data": { "url": "../data/youtubers_df.csv", "format": { "type": "csv" } },
+  "data": { "url": "data/youtubers_df.csv", "format": { "type": "csv" } },
 
   "transform": [
     { "calculate": "upper(datum['ISO-3'] || '')", "as": "ISO3" },
@@ -19,7 +19,7 @@
     {
       "lookup": "ISO3",
       "from": {
-        "data": { "url": "../data/country_codes.csv", "format": { "type": "csv" } },
+        "data": { "url": "data/country_codes.csv", "format": { "type": "csv" } },
         "key": "Alpha-3 code",
         "fields": ["Country"]
       }

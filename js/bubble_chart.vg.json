@@ -6,7 +6,7 @@
   "background": "#ffffff",
   "autosize": { "type": "fit", "contains": "padding" },
 
-  "data": { "url": "../data/youtubers_df.csv", "format": { "type": "csv" } },
+  "data": { "url": "data/youtubers_df.csv", "format": { "type": "csv" } },
 
   "transform": [
     { "calculate": "test(/music/i,(datum.Categories||'')) ? 'Music-Related' : (test(/game/i,(datum.Categories||'')) ? 'Gaming-Related' : (datum.Categories||''))", "as": "Category" },
