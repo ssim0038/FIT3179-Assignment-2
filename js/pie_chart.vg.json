@@ -5,7 +5,7 @@
   "height": 300,
   "background": "transparent",
 
-  "data": { "url": "../data/youtubers_df.csv" },
+  "data": { "url": "https://github.com/ssim0038/FIT3179-Assignment-2/blob/main/data/youtubers_df.csv" },
 
   "transform": [
     {
@@ -53,3 +53,4 @@
     "title": { "color": "#322936", "fontWeight": 700 }
   }
 }
+
