@@ -1,0 +1,75 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Top 10 YouTubers by Subscribers",
+  "width": "container",
+  "height": 300,
+  "background": "#ffffff",
+
+  "data": { "url": "../data/youtubers_df.csv", "format": { "type": "csv" } },
+
+  "transform": [
+    { "calculate": "upper(datum['ISO-3'] || '')", "as": "ISO3" },
+
+    { "calculate": "toNumber(replace((datum['Subscribers']||'')+'', /,/g, ''))",      "as": "SubscribersNum" },
+    { "calculate": "toNumber(replace((datum['Average Likes']||'')+'', /,/g, ''))",    "as": "AvgLikesNum" },
+    { "calculate": "toNumber(replace((datum['Average Visits']||'')+'', /,/g, ''))",   "as": "AvgViewsNum" },
+    { "calculate": "toNumber(replace((datum['Average Comments']||'')+'', /,/g, ''))", "as": "AvgCommentsNum" },
+    { "filter": "isValid(datum.SubscribersNum)" },
+
+    {
+      "lookup": "ISO3",
+      "from": {
+        "data": { "url": "../data/country_codes.csv", "format": { "type": "csv" } },
+        "key": "Alpha-3 code",
+        "fields": ["Country"]
+      }
+    },
+
+    { "calculate": "datum.Country ? datum.Country : datum.ISO3", "as": "CountryName" },
+
+    {
+      "window": [{ "op": "rank", "as": "rank_by_subs" }],
+      "sort": [{ "field": "SubscribersNum", "order": "descending" }]
+    },
+    { "filter": "datum.rank_by_subs <= 10" }
+  ],
+
+  "mark": {
+    "type": "bar",
+    "cornerRadiusTopLeft": 3,
+    "cornerRadiusTopRight": 3,
+    "tooltip": true,
+    "color": "#b40d0d"
+  },
+
+  "encoding": {
+    "x": {
+      "field": "Username",
+      "type": "nominal",
+      "title": "Creator",
+      "sort": { "field": "SubscribersNum", "order": "descending" },
+      "axis": { "labelAngle": -30, "labelLimit": 160 }
+    },
+    "y": {
+      "field": "SubscribersNum",
+      "type": "quantitative",
+      "title": "Subscribers",
+      "axis": { "format": ",~s" }
+    },
+    "tooltip": [
+      { "field": "Username",       "title": "Channel" },
+      { "field": "CountryName",    "title": "Country" },
+      { "field": "SubscribersNum", "title": "Subscribers",      "type": "quantitative", "format": ",.0f" },
+      { "field": "AvgViewsNum",    "title": "Average Views",    "type": "quantitative", "format": ",.0f" },
+      { "field": "AvgLikesNum",    "title": "Average Likes",    "type": "quantitative", "format": ",.0f" },
+      { "field": "AvgCommentsNum", "title": "Average Comments", "type": "quantitative", "format": ",.0f" }
+    ]
+  },
+
+  "config": {
+    "view": { "stroke": null },
+    "axis": { "labelColor": "#322936", "titleColor": "#322936" },
+    "legend": { "labelColor": "#322936", "titleColor": "#322936" },
+    "title": { "color": "#322936", "fontWeight": 700 }
+  }
+}

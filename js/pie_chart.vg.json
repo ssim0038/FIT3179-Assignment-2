@@ -1,36 +1,48 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": "Share of Channels by Category",
+  "title": "Number of Channels by Category",
   "width": 300,
   "height": 300,
   "background": "transparent",
 
-  "data": { "url": "https://raw.githubusercontent.com/ssim0038/FIT3179-Assignment-2/refs/heads/main/data/youtubers_df.csv" },
+  "data": { "url": "../data/youtubers_df.csv" },
 
   "transform": [
-    { "aggregate": [{ "op": "count", "as": "channels" }], "groupby": ["Categories"] }, 
+    {
+      "calculate":
+        "test(/music/i, (datum.Categories || '')) ? 'Music-Related' : (test(/game/i, (datum.Categories || '')) ? 'Gaming-Related' : datum.Categories)",
+      "as": "cat_mapped"
+    },
+    { "aggregate": [{ "op": "count", "as": "channels" }], "groupby": ["cat_mapped"] },
     { "joinaggregate": [{ "op": "sum", "field": "channels", "as": "total_channels" }] },
     { "calculate": "datum.channels / datum.total_channels", "as": "percent" },
-    {"calculate": "datum.percent < 0.01 ? 'Others' : datum.Categories", "as": "cat_grouped"},
-    { "aggregate": [{ "op": "sum", "field": "channels", "as": "channels_grouped" }], "groupby": ["cat_grouped"] },
+    { "calculate": "datum.percent < 0.01 ? 'Others' : datum.cat_mapped", "as": "cat_grouped" },
+
+    {
+      "calculate":
+        "datum.cat_grouped == 'Lifestyle_(sociology)' ? 'Lifestyle' : (datum.cat_grouped == 'Television_program' ? 'Television Program' : datum.cat_grouped)",
+      "as": "cat_label"
+    },
+
+    { "aggregate": [{ "op": "sum", "field": "channels", "as": "channels_grouped" }], "groupby": ["cat_label"] },
     { "joinaggregate": [{ "op": "sum", "field": "channels_grouped", "as": "total_grouped" }] },
     { "calculate": "datum.channels_grouped / datum.total_grouped", "as": "pct_grouped" }
   ],
 
-  "mark": { "type": "arc", "innerRadius": 0, "tooltip": true},
+  "mark": { "type": "arc", "innerRadius": 0, "tooltip": true },
 
   "encoding": {
     "theta": { "field": "channels_grouped", "type": "quantitative", "stack": true },
     "color": {
-      "field": "cat_grouped",
+      "field": "cat_label",
       "type": "nominal",
       "title": "Category",
       "scale": { "scheme": "tableau20" }
     },
     "tooltip": [
-      { "field": "cat_grouped", "type": "nominal", "title": "Category" },
-      { "field": "channels_grouped", "type": "quantitative", "title": "Channels", "format": ",.0f" },
-      { "field": "pct_grouped", "type": "quantitative", "title": "Percentage of channels", "format": ".1%" }
+      { "field": "cat_label", "title": "Category" },
+      { "field": "channels_grouped", "title": "Channels", "format": ",.0f" },
+      { "field": "pct_grouped", "title": "Percentage of channels", "format": ".1%" }
     ]
   },
 
@@ -41,4 +53,3 @@
     "title": { "color": "#322936", "fontWeight": 700 }
   }
 }
-

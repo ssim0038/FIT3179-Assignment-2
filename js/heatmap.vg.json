@@ -1,0 +1,119 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Channels / Subscribers by Category × Country",
+  "width": "container",
+  "height": 250,
+  "background": "#ffffff",
+  "params": [
+    {
+      "name": "metric",
+      "value": "channels",
+      "bind": {
+        "input": "select",
+        "options": ["channels", "subscribers"],
+        "labels": ["Channels", "Total subscribers"],
+        "name": "Metric: ",
+        "element": "#heatmap-controls"
+      }
+    }
+  ],
+
+  "data": {
+    "url": "../data/youtubers_df.csv",
+    "format": { "type": "csv", "parse": { "Subscribers": "number" } }
+  },
+
+  "transform": [
+    {
+      "calculate": "test(/music/i,(datum.Categories||'')) ? 'Music-Related' : (test(/game/i,(datum.Categories||'')) ? 'Gaming-Related' : (datum.Categories||''))",
+      "as": "Category"
+    },
+    {
+      "calculate": "(datum.Category=='Lifestyle_(sociology)') ? 'Lifestyle' : ((datum.Category=='Television_program') ? 'Television Program' : datum.Category)",
+      "as": "Category"
+    },
+    { "calculate": "replace(datum.Category, /_/g, ' ')", "as": "Category" },
+
+    { "calculate": "upper(trim((datum['ISO-3']||'')))", "as": "ISO3" },
+    { "filter": "datum.Category!='' && datum.ISO3!=''" },
+
+    {
+      "lookup": "ISO3",
+      "from": {
+        "data": { "url": "../data/country_codes.csv", "format": { "type": "csv" } },
+        "key": "Alpha-3 code",
+        "fields": ["Country"]
+      }
+    },
+    { "calculate": "datum.Country ? datum.Country : datum.ISO3", "as": "CountryName" },
+
+    {
+      "aggregate": [
+        { "op": "count", "as": "CountChannels" },
+        { "op": "sum", "field": "Subscribers", "as": "SumSubscribers" }
+      ],
+      "groupby": ["Category", "CountryName"]
+    },
+
+    { "joinaggregate": [{ "op": "sum", "field": "CountChannels", "as": "CatCountTotal" }], "groupby": ["Category"] },
+    { "joinaggregate": [{ "op": "sum", "field": "CountChannels", "as": "GrandCount" }] },
+    { "calculate": "datum.CatCountTotal / datum.GrandCount", "as": "CatShare" },
+    { "calculate": "datum.CatShare < 0.01 ? 'Others' : datum.Category", "as": "CategoryDisplay" },
+
+    {
+      "aggregate": [
+        { "op": "sum", "field": "CountChannels", "as": "CountChannels" },
+        { "op": "sum", "field": "SumSubscribers", "as": "SumSubscribers" }
+      ],
+      "groupby": ["CategoryDisplay", "CountryName"]
+    },
+
+    { "calculate": "metric=='channels' ? datum.CountChannels : datum.SumSubscribers", "as": "MetricValue" },
+
+    { "joinaggregate": [{ "op": "sum", "field": "MetricValue", "as": "CatTotal" }], "groupby": ["CategoryDisplay"] },
+    { "joinaggregate": [{ "op": "sum", "field": "MetricValue", "as": "CountryTotal" }], "groupby": ["CountryName"] }
+  ],
+
+  "mark": "rect",
+
+  "encoding": {
+    "y": {
+      "field": "CategoryDisplay",
+      "type": "nominal",
+      "title": "Category",
+      "sort": { "field": "CatTotal", "order": "descending" }
+    },
+    "x": {
+      "field": "CountryName",
+      "type": "nominal",
+      "title": "Country",
+      "sort": { "field": "CountryTotal", "order": "descending" },
+      "axis": { "labelAngle": -50, "labelLimit": 140 }
+    },
+    "color": {
+        "field": "MetricValue",
+        "type": "quantitative",
+        "scale": { "scheme": "reds" },
+        "legend": {
+            "title": "Metric",
+            "orient": "bottom",
+            "direction": "horizontal",
+            "gradientLength": 280,
+            "format": ",.0f"
+        }
+        },
+    "tooltip": [
+      { "field": "CategoryDisplay", "title": "Category" },
+      { "field": "CountryName", "title": "Country" },
+      { "field": "CountChannels", "type": "quantitative", "title": "Channels", "format": ",.0f" },
+      { "field": "SumSubscribers", "type": "quantitative", "title": "Total subscribers", "format": ",.0f" }
+    ]
+  },
+
+  "config": {
+    "view": { "stroke": null },
+    "axis": { "labelColor": "#322936", "titleColor": "#322936" },
+    "legend": { "labelColor": "#322936", "titleColor": "#322936" },
+    "title": { "color": "#322936", "fontWeight": 700 }
+  }
+}

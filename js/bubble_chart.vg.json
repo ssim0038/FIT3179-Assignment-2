@@ -1,0 +1,86 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Average Subscribers vs Average Views by Category",
+  "width": "container",
+  "height": 420,
+  "background": "#ffffff",
+  "autosize": { "type": "fit", "contains": "padding" },
+
+  "data": { "url": "../data/youtubers_df.csv", "format": { "type": "csv" } },
+
+  "transform": [
+    { "calculate": "test(/music/i,(datum.Categories||'')) ? 'Music-Related' : (test(/game/i,(datum.Categories||'')) ? 'Gaming-Related' : (datum.Categories||''))", "as": "Category" },
+    { "calculate": "(datum.Category=='Lifestyle_(sociology)') ? 'Lifestyle' : ((datum.Category=='Television_program') ? 'Television Program' : datum.Category)", "as": "Category" },
+    { "calculate": "replace(datum.Category, /_/g, ' ')", "as": "Category" },
+    { "filter": "datum.Category != ''" },
+
+    { "calculate": "(toNumber(replace((datum['Subscribers']||'')+'', /,/g, '')) || 0)",     "as": "SubsNum" },
+    { "calculate": "(toNumber(replace((datum['Average Visits']||'')+'', /,/g, '')) || 0)", "as": "ViewsNum" },
+    
+    { "joinaggregate": [{ "op": "count", "as": "CatCount" }], "groupby": ["Category"] },
+    { "joinaggregate": [{ "op": "count", "as": "GrandCount" }] },
+    { "calculate": "datum.CatCount / datum.GrandCount", "as": "CatShare" },
+    { "calculate": "datum.CatShare < 0.01 ? 'Others' : datum.Category", "as": "CategoryDisplay" },
+
+    {
+      "aggregate": [
+        { "op": "sum", "field": "SubsNum", "as": "SumSubs" },
+        { "op": "sum", "field": "ViewsNum", "as": "SumViews" },
+        { "op": "count", "as": "N" }
+      ],
+      "groupby": ["CategoryDisplay"]
+    },
+
+    { "calculate": "datum.SumSubs  / max(datum.N,1)", "as": "AvgSubs"  },
+    { "calculate": "datum.SumViews / max(datum.N,1)", "as": "AvgViews" },
+
+    { "filter": "datum.AvgSubs > 0 && datum.AvgViews > 0" },
+
+    { "calculate": "datum.AvgSubs + datum.AvgViews", "as": "SortScore" }
+  ],
+
+  "mark": { "type": "circle", "opacity": 0.85, "tooltip": true },
+
+  "encoding": {
+    "x": {
+      "field": "AvgSubs",
+      "type": "quantitative",
+      "title": "Average Subscribers per Channel",
+      "axis": { "format": ",~s" },
+      "scale": { "domain": [15000000, 27000000] }
+    },
+    "y": {
+      "field": "AvgViews",
+      "type": "quantitative",
+      "title": "Average Views per Channel",
+      "axis": { "format": ",~s" },
+      "scale": { "domainMax": 2400000 }
+    },
+    "size": {
+      "field": "N",
+      "type": "quantitative",
+      "title": "Channels in Category",
+      "scale": { "range": [24, 1600] }
+    },
+    "color": {
+      "field": "CategoryDisplay",
+      "type": "nominal",
+      "title": "Category",
+      "scale": { "scheme": "tableau20" }
+    },
+    "order": { "field": "N" },
+    "tooltip": [
+      { "field": "CategoryDisplay", "title": "Category" },
+      { "field": "N",              "title": "Channels",          "format": ",.0f" },
+      { "field": "AvgSubs",        "title": "Avg Subscribers",   "format": ",.0f" },
+      { "field": "AvgViews",       "title": "Avg Views",         "format": ",.0f" }
+    ]
+  },
+
+  "config": {
+    "view": { "stroke": null },
+    "axis":  { "labelColor": "#322936", "titleColor": "#322936" },
+    "legend":{ "labelColor": "#322936", "titleColor": "#322936" },
+    "title": { "color": "#322936", "fontWeight": 700 }
+  }
+}

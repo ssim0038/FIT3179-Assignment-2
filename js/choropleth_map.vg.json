@@ -1,11 +1,24 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
 
-  "title": "Top YouTubers — Channels per Country",
+  "title": "Top YouTube Channels by Country",
   "width": "container",
-  "height": 560,
+  "height": 450,
   "background": "#fcfdfd",
-  "projection": { "type": "equalEarth" },
+    "params": [
+    {
+      "name": "subThreshold",
+      "value": 0,
+      "bind": {
+        "input": "select",
+        "options": [0, 100000000, 200000000, 300000000, 500000000],
+        "labels": ["Show all", " >100M", " >200M", " >300M", " >500M"],
+        "name": "Minimum no. of Subscribers: ",
+        "element": "#map-filter-controls"
+      }
+    }
+  ],
+  "projection": { "type": "equalEarth"},
 
   "data": {
     "url": "data/youtubers_df.csv"
@@ -45,6 +58,9 @@
       "mark": { "type": "geoshape", "fill": "#e0e0e0", "stroke": "#ffffff", "strokeWidth": 0.5 }
     },
     {
+      "transform": [
+        { "filter": "isValid(datum.total_subscribers) && datum.total_subscribers >= subThreshold" }
+      ],
       "mark": { "type": "geoshape" },
       "encoding": {
         "shape": { "field": "geo", "type": "geojson" },
@@ -52,12 +68,16 @@
           "field": "channels_count",
           "type": "quantitative",
           "title": "Channels",
-          "scale": { "scheme": "reds" }
+          "scale": {
+            "type": "threshold",
+            "domain": [1, 10, 30, 50, 100, 200, 300],
+            "scheme": { "name": "reds", "count": 8 }
+          }
         },
         "tooltip": [
           { "field": "Country", "title": "Country" },
           { "field": "channels_count", "title": "Channels" },
-          { "field": "total_subscribers", "title": "Total subscribers" }
+          { "field": "total_subscribers", "title": "Total subscribers", "format": ",.0f" }
         ]
       }
     },
